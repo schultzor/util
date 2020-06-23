@@ -1,5 +1,5 @@
-// find all the AWS Lambda function log events for a given function in the last N hours and print them to stdout
-// assumes that AWS credentials are provided in the environment or other external configuration
+// Finds log streams for an AWS Lambda function containing recent log events,
+// then prints those events to stdout.
 package main
 
 import (
@@ -42,7 +42,7 @@ func ParseMillis(epochMillis int64) time.Time {
 }
 
 func main() {
-	var hours = flag.Int("hours", 24, "number of hours to look back in lambda logs")
+	var hours = flag.Int("hours", 24, "number of hours to look back when selecting log streams")
 	var region = flag.String("region", "us-west-2", "AWS region")
 	flag.Parse()
 	funcName := flag.Arg(0)
@@ -53,7 +53,7 @@ func main() {
 		listGroups()
 		os.Exit(0)
 	}
-	cutoff := time.Now().Add(-time.Hour * time.Duration(*hours))
+	cutoff := time.Now().UTC().Add(-time.Hour * time.Duration(*hours))
 	groupName := lambdaPrefix + funcName
 	fmt.Fprintf(os.Stderr, "Finding streams for %s with last event time after %s\n", groupName, cutoff.Format(time.RFC3339))
 	streams := []string{}
